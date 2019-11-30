@@ -2,7 +2,7 @@
 
 TP set-up for test Alert Monitor system. 
 
-Companion code to Kx Technical White Paper [“Latency and efficiency considerations for a real-time surveillance system”](https://code.kx.com/v2/pw/surveillance-latency/).
+Companion code to Kx Technical White Paper [“Latency and efficiency considerations for a real-time surveillance system”](https://code.kx.com/v2/wp/surveillance-latency/).
 
 This framework is an expansion of the skeleton TP framework described in Kx Technical White Paper [“Building real-time tick subscribers”](https://code.kx.com/v2/wp/building_real_time_tick_subscribers.pdf).
 
