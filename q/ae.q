@@ -13,7 +13,7 @@ system"c 25 300";
 .ae.executionPoint:$[.ae.intradayFrequency>0D;`intraday;`realTime];
 .ae.replayStartTime:value raze .proc.inputOptions[`replayStartTime];
 .ae.nextIntradayTransactionTimeRunPoint:.ae.replayStartTime+.ae.intradayFrequency;
-.ae.lastEventAnalysed:0;
+.ae.lastEventAnalyzed:0;
 
 .ae.alertFunction:`$raze .proc.inputOptions[`alertFunction];
 
@@ -50,30 +50,30 @@ upd:{[t;x]
             startTime:.z.P;
             wBefore:.Q.w[];
 
-            `dataToAnalyse set $[.ae.executionPoint=`realTime;
+            `dataToAnalyze set $[.ae.executionPoint=`realTime;
                 [
                     select transactTime,sym,eventID,orderID,executionOptions,eventType,orderType from x where eventType=`Place
                 ];
                 [
                     select transactTime,sym,eventID,orderID,executionOptions,eventType,orderType from dxOrderPublic where 
-                        eventID>.ae.lastEventAnalysed,
+                        eventID>.ae.lastEventAnalyzed,
                         not (executionOptions in `$("fill-or-kill";"immediate-or-cancel";"maker-or-cancel")) and ({`Place`Cancel~x};eventType)fby ([]orderID;transactTime),
                         transactTime<.ae.nextIntradayTransactionTimeRunPoint-0D00:00:10*not endOfReplay,
                         eventType=`Place
                 ]
             ];
-            if[not count dataToAnalyse;:`noDataToAnalyse];
-            .log.out["Analysing data from ",string[first dataToAnalyse[`transactTime]]," to ",string[last dataToAnalyse[`transactTime]]];
+            if[not count dataToAnalyze;:`noDataToAnalyze];
+            .log.out["Analysing data from ",string[first dataToAnalyze[`transactTime]]," to ",string[last dataToAnalyze[`transactTime]]];
             tsvector:$[.ae.alertFunction like "*oneAtATime*";
-                system"ts:20 .ae.alertFunction[;.ae.executionPoint] peach dataToAnalyse";
-                system"ts:20 .ae.alertFunction[dataToAnalyse;.ae.executionPoint]"
+                system"ts:20 .ae.alertFunction[;.ae.executionPoint] peach dataToAnalyze";
+                system"ts:20 .ae.alertFunction[dataToAnalyze;.ae.executionPoint]"
             ];
             endTime:.z.P;
             wAfter:.Q.w[];
 
-            .ae.statsTablePath upsert cols[dxStats]!(.ae.testStartTime;`$first "_"vs string .proc.name;.ae.intradayFrequency;.ae.alertFunction;startTime;endTime;min[dataToAnalyse`transactTime];max[dataToAnalyse`transactTime];tsvector[0];tsvector[1];wBefore`used;wAfter`used;wBefore`heap;wAfter`heap);
+            .ae.statsTablePath upsert cols[dxStats]!(.ae.testStartTime;`$first "_"vs string .proc.name;.ae.intradayFrequency;.ae.alertFunction;startTime;endTime;min[dataToAnalyze`transactTime];max[dataToAnalyze`transactTime];tsvector[0];tsvector[1];wBefore`used;wAfter`used;wBefore`heap;wAfter`heap);
 
-            .ae.lastEventAnalysed:last[dataToAnalyse`eventID];
+            .ae.lastEventAnalyzed:last[dataToAnalyze`eventID];
             .ae.nextIntradayTransactionTimeRunPoint+:.ae.intradayFrequency;
             if[endOfReplay;.log.out["Engine Finished"];`dxReplayStatus insert (.z.P;`engineFinished)];
         ];
